@@ -33,3 +33,17 @@ Config.load читает и проверяет настройки, Csv.parse р�
 Coordinate.parse проверяет координаты, Coordinate.pomPath строит путь POM.
 Main.execute запускает приложение, Main.main обрабатывает ошибки.
 Описание назначения методов также дано в Javadoc исходных файлов.
+
+## Этап 2: прямые зависимости Maven
+
+Пример: `run.bat examples/junit.csv` скачивает POM по URL репозитория
+и выводит прямые зависимости. `run.bat examples/test.csv 1` показывает
+только параметры первого этапа. Сеть для первого этапа не нужна.
+
+MavenRepository.dependencies получает POM и разрешает родителей и BOM
+явным стеком. PomModel.read объединяет свойства и зависимости,
+PomModel.expand раскрывает ${property}, PomModel.direct получает
+координаты прямых зависимостей. Xml.parse запрещает DTD и внешние ресурсы.
+Dependency.managed подставляет dependencyManagement. Maven и сторонние
+библиотеки внутри приложения не вызываются. Ошибки HTTP, XML,
+неразрешённых свойств и версий не скрываются.

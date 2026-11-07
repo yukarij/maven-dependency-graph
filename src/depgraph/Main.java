@@ -20,13 +20,21 @@ public final class Main {
         }
     }
 
-    /** Loads the CSV and prints the stage-one key-value representation. */
+    /** Runs the configuration prototype or direct-dependency collection. */
     public static void execute(String[] arguments) throws Exception {
         if (arguments.length == 0 || arguments.length > MAX_ARGUMENTS) {
             throw new IllegalArgumentException("Usage: run CONFIG.csv [stage]");
         }
         Config config = Config.load(Path.of(arguments[0]));
-        printConfig(config);
+        if (arguments.length == MAX_ARGUMENTS && arguments[1].equals("1")) {
+            printConfig(config);
+            return;
+        }
+        if (config.testMode()) {
+            throw new IllegalArgumentException("Stage 2 requires a Maven repository");
+        }
+        Repository repository = new MavenRepository(config.repository());
+        repository.dependencies(config.packageName()).forEach(System.out::println);
     }
 
     /** Prints each of the four user-configurable parameters. */

@@ -11,7 +11,8 @@ public final class AllTests {
     /** Executes all available test groups. */
     public static void main(String[] arguments) throws Exception {
         testConfiguration();
-        System.out.println("PASS: configuration");
+        PomTests.run();
+        System.out.println("PASS: configuration, POM parsing");
     }
 
     /** Checks CSV quoting, relative paths and Maven coordinate layout. */
