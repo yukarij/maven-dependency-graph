@@ -12,7 +12,8 @@ public final class AllTests {
     public static void main(String[] arguments) throws Exception {
         testConfiguration();
         PomTests.run();
-        System.out.println("PASS: configuration, POM parsing");
+        GraphTests.run();
+        System.out.println("PASS: configuration, POM parsing, iterative DFS");
     }
 
     /** Checks CSV quoting, relative paths and Maven coordinate layout. */

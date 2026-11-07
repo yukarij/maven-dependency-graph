@@ -1,11 +1,13 @@
 package depgraph;
 
 import java.nio.file.Path;
+import java.util.Set;
 
 /** Command-line entry point for variant 26. */
 public final class Main {
     private static final int MAX_ARGUMENTS = 2;
     private static final int ERROR_EXIT = 1;
+    private static final int NO_ARGUMENTS = 0;
 
     /** Prevents utility construction. */
     private Main() { }
@@ -20,21 +22,27 @@ public final class Main {
         }
     }
 
-    /** Runs the configuration prototype or direct-dependency collection. */
+    /** Runs the selected development stage; settings always come from CSV. */
     public static void execute(String[] arguments) throws Exception {
-        if (arguments.length == 0 || arguments.length > MAX_ARGUMENTS) {
+        if (arguments.length == NO_ARGUMENTS || arguments.length > MAX_ARGUMENTS) {
             throw new IllegalArgumentException("Usage: run CONFIG.csv [stage]");
         }
         Config config = Config.load(Path.of(arguments[0]));
-        if (arguments.length == MAX_ARGUMENTS && arguments[1].equals("1")) {
+        String stage = arguments.length == MAX_ARGUMENTS ? arguments[1] : "3";
+        if (!Set.of("1", "2", "3").contains(stage)) {
+            throw new IllegalArgumentException("Stage must be 1, 2 or 3");
+        }
+        if (stage.equals("1")) {
             printConfig(config);
             return;
         }
-        if (config.testMode()) {
-            throw new IllegalArgumentException("Stage 2 requires a Maven repository");
+        Repository repository = config.testMode() ? new TestRepository(Path.of(config.repository()))
+                : new MavenRepository(config.repository());
+        if (stage.equals("2")) {
+            repository.dependencies(config.packageName()).forEach(System.out::println);
+            return;
         }
-        Repository repository = new MavenRepository(config.repository());
-        repository.dependencies(config.packageName()).forEach(System.out::println);
+        System.out.print(Graph.traverse(config.packageName(), repository).adjacency());
     }
 
     /** Prints each of the four user-configurable parameters. */
