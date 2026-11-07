@@ -39,4 +39,23 @@ public record Graph(Map<String, List<String>> edges) {
                 .append(String.join(" ", children)).append('\n'));
         return result.toString();
     }
+
+    /** Reverses each edge while preserving vertices without incoming edges. */
+    public Graph reversed() {
+        Map<String, List<String>> reversed = new LinkedHashMap<>();
+        edges.keySet().forEach(name -> reversed.put(name, new ArrayList<>()));
+        edges.forEach((name, children) -> children.forEach(child ->
+                reversed.computeIfAbsent(child, key -> new ArrayList<>()).add(name)));
+        return new Graph(reversed);
+    }
+
+    /** Finds direct and transitive dependents with the same iterative DFS. */
+    public List<String> dependents(String target) throws Exception {
+        Graph reversed = reversed();
+        if (!reversed.edges.containsKey(target)) {
+            throw new IllegalArgumentException("Unknown package: " + target);
+        }
+        Graph reachable = traverse(target, name -> reversed.edges.get(name));
+        return reachable.edges.keySet().stream().filter(name -> !name.equals(target)).toList();
+    }
 }

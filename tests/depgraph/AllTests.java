@@ -13,7 +13,8 @@ public final class AllTests {
         testConfiguration();
         PomTests.run();
         GraphTests.run();
-        System.out.println("PASS: configuration, POM parsing, iterative DFS");
+        ReverseTests.run();
+        System.out.println("PASS: configuration, POM parsing, iterative DFS, reverse graph");
     }
 
     /** Checks CSV quoting, relative paths and Maven coordinate layout. */

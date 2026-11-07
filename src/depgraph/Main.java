@@ -28,9 +28,9 @@ public final class Main {
             throw new IllegalArgumentException("Usage: run CONFIG.csv [stage]");
         }
         Config config = Config.load(Path.of(arguments[0]));
-        String stage = arguments.length == MAX_ARGUMENTS ? arguments[1] : "3";
-        if (!Set.of("1", "2", "3").contains(stage)) {
-            throw new IllegalArgumentException("Stage must be 1, 2 or 3");
+        String stage = arguments.length == MAX_ARGUMENTS ? arguments[1] : "4";
+        if (!Set.of("1", "2", "3", "4").contains(stage)) {
+            throw new IllegalArgumentException("Stage must be 1, 2, 3 or 4");
         }
         if (stage.equals("1")) {
             printConfig(config);
@@ -40,6 +40,12 @@ public final class Main {
                 : new MavenRepository(config.repository());
         if (stage.equals("2")) {
             repository.dependencies(config.packageName()).forEach(System.out::println);
+            return;
+        }
+        if (stage.equals("4")) {
+            Graph universe = repository instanceof TestRepository test
+                    ? new Graph(test.all()) : Graph.traverse(config.packageName(), repository);
+            universe.dependents(config.packageName()).forEach(System.out::println);
             return;
         }
         System.out.print(Graph.traverse(config.packageName(), repository).adjacency());

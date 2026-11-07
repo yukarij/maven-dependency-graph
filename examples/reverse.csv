@@ -1,0 +1,4 @@
+package,D
+repository,repository.csv
+test_mode,true
+ascii_tree,false
