@@ -3,21 +3,22 @@ package depgraph;
 import java.nio.file.Path;
 import java.util.List;
 
-/** Runs dependency-free automated tests with assertions enabled. */
 public final class AllTests {
-    /** Prevents utility construction. */
+
     private AllTests() { }
 
-    /** Executes all available test groups. */
     public static void main(String[] arguments) throws Exception {
         testConfiguration();
+        ConfigTests.run();
         PomTests.run();
+        HttpTests.run();
         GraphTests.run();
         ReverseTests.run();
-        System.out.println("PASS: configuration, POM parsing, iterative DFS, reverse graph");
+        RenderTests.run();
+        CliTests.run();
+        System.out.println("PASS: 8 test groups (CSV, errors, POM, HTTP, DFS, reverse, rendering, CLI)");
     }
 
-    /** Checks CSV quoting, relative paths and Maven coordinate layout. */
     private static void testConfiguration() throws Exception {
         Config config = Config.load(Path.of("examples/test.csv"));
         assert config.packageName().equals("A");

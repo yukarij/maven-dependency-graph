@@ -1,0 +1,8 @@
+@startuml
+left to right direction
+rectangle "org.slf4j:slf4j-simple:2.0.16" as node0
+rectangle "org.slf4j:slf4j-api:2.0.16" as node1
+node0 --> node1
+@enduml
+org.slf4j:slf4j-simple:2.0.16
+\-- org.slf4j:slf4j-api:2.0.16

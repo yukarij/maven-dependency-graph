@@ -7,13 +7,26 @@ import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.helpers.DefaultHandler;
 
-/** Secure namespace-aware helpers for direct POM children. */
 public final class Xml {
-    /** Prevents utility construction. */
+
+    private static final class Errors extends DefaultHandler {
+
+        @Override
+        public void error(SAXParseException exception) throws SAXParseException {
+            throw exception;
+        }
+
+        @Override
+        public void fatalError(SAXParseException exception) throws SAXParseException {
+            throw exception;
+        }
+    }
+
     private Xml() { }
 
-    /** Parses XML with DTDs and external resources disabled. */
     public static Element parse(byte[] content) throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
@@ -22,10 +35,15 @@ public final class Xml {
         factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
         factory.setXIncludeAware(false);
         factory.setExpandEntityReferences(false);
-        return factory.newDocumentBuilder().parse(new ByteArrayInputStream(content)).getDocumentElement();
+        var builder = factory.newDocumentBuilder();
+        builder.setErrorHandler(new Errors());
+        Element root = builder.parse(new ByteArrayInputStream(content)).getDocumentElement();
+        if (!root.getLocalName().equals("project")) {
+            throw new IllegalArgumentException("POM root element must be project");
+        }
+        return root;
     }
 
-    /** Returns direct element children, never nested plugin dependencies. */
     public static List<Element> children(Element parent, String name) {
         List<Element> result = new ArrayList<>();
         if (parent == null) {
@@ -39,13 +57,11 @@ public final class Xml {
         return result;
     }
 
-    /** Returns an optional direct child. */
     public static Element child(Element parent, String name) {
         List<Element> elements = children(parent, name);
         return elements.isEmpty() ? null : elements.get(0);
     }
 
-    /** Returns trimmed text or an empty string for an absent child. */
     public static String text(Element parent, String name) {
         Element element = child(parent, name);
         return element == null ? "" : element.getTextContent().trim();

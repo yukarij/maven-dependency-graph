@@ -9,13 +9,11 @@ import java.util.regex.Pattern;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-/** Effective subset of a POM: inheritance, properties and dependency management. */
 public record PomModel(Map<String, String> properties,
                        Map<String, Dependency> management, List<Dependency> dependencies) {
     private static final Pattern PROPERTY = Pattern.compile("\\$\\{([^}]+)}");
     private static final int EXPANSION_LIMIT = 100;
 
-    /** Builds a model after its parent has been resolved. */
     public static PomModel read(Element root, Coordinate coordinate, PomModel parent) {
         Map<String, String> properties = new LinkedHashMap<>();
         Map<String, Dependency> management = new LinkedHashMap<>();
@@ -43,7 +41,6 @@ public record PomModel(Map<String, String> properties,
         return new PomModel(properties, management, new ArrayList<>(dependencies.values()));
     }
 
-    /** Copies direct XML property elements. */
     private static void addProperties(Element root, Map<String, String> properties) {
         Element element = Xml.child(root, "properties");
         if (element == null) {
@@ -56,13 +53,11 @@ public record PomModel(Map<String, String> properties,
         }
     }
 
-    /** Reads only declarations directly inside the supplied dependencies element. */
     private static List<Dependency> readDependencies(Element element, Map<String, String> properties) {
         return Xml.children(element, "dependency").stream()
                 .map(item -> Dependency.read(item, properties)).toList();
     }
 
-    /** Expands nested properties, rejecting unresolved or cyclic references. */
     public static String expand(String value, Map<String, String> properties) {
         String result = value;
         for (int attempt = 0; attempt < EXPANSION_LIMIT; attempt++) {
@@ -79,13 +74,11 @@ public record PomModel(Map<String, String> properties,
         throw new IllegalArgumentException("Cyclic or excessively nested POM property: " + value);
     }
 
-    /** Lists imported BOM coordinates in declaration order. */
     public List<Coordinate> imports() {
         return management.values().stream().filter(Dependency::isImport)
                 .map(Dependency::coordinate).toList();
     }
 
-    /** Merges BOM defaults without overriding explicit local management. */
     public PomModel withImports(Map<Coordinate, PomModel> models) {
         Map<String, Dependency> combined = new LinkedHashMap<>();
         for (Coordinate imported : imports()) {
@@ -96,7 +89,6 @@ public record PomModel(Map<String, String> properties,
         return new PomModel(properties, combined, dependencies);
     }
 
-    /** Resolves and filters the direct graph edges of this model. */
     public List<String> direct() {
         return dependencies.stream().map(item -> item.managed(management))
                 .filter(Dependency::included).map(Dependency::coordinate)

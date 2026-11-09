@@ -7,9 +7,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/** A directed graph: an edge points from a package to its dependency. */
 public record Graph(Map<String, List<String>> edges) {
-    /** Builds the reachable subgraph using DFS with an explicit stack. */
+
     public static Graph traverse(String root, Repository repository) throws Exception {
         Map<String, List<String>> edges = new LinkedHashMap<>();
         Deque<String> stack = new ArrayDeque<>();
@@ -32,7 +31,6 @@ public record Graph(Map<String, List<String>> edges) {
         return new Graph(edges);
     }
 
-    /** Prints a deterministic adjacency list for the third development stage. */
     public String adjacency() {
         StringBuilder result = new StringBuilder();
         edges.forEach((name, children) -> result.append(name).append(" -> ")
@@ -40,7 +38,6 @@ public record Graph(Map<String, List<String>> edges) {
         return result.toString();
     }
 
-    /** Reverses each edge while preserving vertices without incoming edges. */
     public Graph reversed() {
         Map<String, List<String>> reversed = new LinkedHashMap<>();
         edges.keySet().forEach(name -> reversed.put(name, new ArrayList<>()));
@@ -49,7 +46,6 @@ public record Graph(Map<String, List<String>> edges) {
         return new Graph(reversed);
     }
 
-    /** Finds direct and transitive dependents with the same iterative DFS. */
     public List<String> dependents(String target) throws Exception {
         Graph reversed = reversed();
         if (!reversed.edges.containsKey(target)) {

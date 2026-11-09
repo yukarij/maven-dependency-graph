@@ -1,0 +1,2 @@
+local:comparison:jar:1
+\- org.hamcrest:hamcrest:jar:2.2:compile

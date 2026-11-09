@@ -5,14 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/** Graph traversal checks covering cycles, shared vertices and deep chains. */
 public final class GraphTests {
     private static final int CHAIN_LENGTH = 20000;
 
-    /** Prevents utility construction. */
     private GraphTests() { }
 
-    /** Runs DFS, fixture and stack-safety checks. */
     public static void run() throws Exception {
         TestRepository repository = new TestRepository(Path.of("examples/repository.csv"));
         Graph diamond = Graph.traverse("A", repository);
@@ -26,7 +23,6 @@ public final class GraphTests {
         testDeepChain();
     }
 
-    /** Proves traversal does not consume the Java call stack. */
     private static void testDeepChain() throws Exception {
         Repository chain = name -> {
             int index = Integer.parseInt(name);

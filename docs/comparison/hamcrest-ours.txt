@@ -1,0 +1,5 @@
+@startuml
+left to right direction
+rectangle "org.hamcrest:hamcrest:2.2" as node0
+@enduml
+org.hamcrest:hamcrest:2.2

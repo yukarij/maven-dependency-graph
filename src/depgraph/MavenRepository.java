@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 import org.w3c.dom.Element;
 
-/** Fetches and parses POMs using only JDK HTTP and XML APIs. */
 public final class MavenRepository implements Repository {
     private static final int HTTP_OK = 200;
     private static final Duration TIMEOUT = Duration.ofSeconds(30);
@@ -22,12 +21,10 @@ public final class MavenRepository implements Repository {
     private final Map<Coordinate, PomModel> models = new HashMap<>();
     private final Map<Coordinate, Element> documents = new HashMap<>();
 
-    /** Stores the repository base URL. */
     public MavenRepository(String baseUrl) {
         this.baseUrl = baseUrl;
     }
 
-    /** Loads effective direct compile/runtime dependencies. */
     @Override
     public java.util.List<String> dependencies(String name) throws Exception {
         Coordinate coordinate = Coordinate.parse(name);
@@ -35,7 +32,6 @@ public final class MavenRepository implements Repository {
         return models.get(coordinate).direct();
     }
 
-    /** Resolves parent and BOM models with an explicit stack, without recursion. */
     private void resolve(Coordinate root) throws Exception {
         Deque<Coordinate> stack = new ArrayDeque<>();
         stack.push(root);
@@ -65,7 +61,6 @@ public final class MavenRepository implements Repository {
         }
     }
 
-    /** Schedules one missing prerequisite and detects invalid model cycles. */
     private boolean schedule(Coordinate coordinate, Deque<Coordinate> stack) {
         if (models.containsKey(coordinate)) {
             return false;
@@ -77,7 +72,6 @@ public final class MavenRepository implements Repository {
         return true;
     }
 
-    /** Reads a parent's fixed coordinates when present. */
     private Coordinate parent(Element document) {
         Element element = Xml.child(document, "parent");
         if (element == null) {
@@ -87,7 +81,6 @@ public final class MavenRepository implements Repository {
                 + Xml.text(element, "artifactId") + ":" + Xml.text(element, "version"));
     }
 
-    /** Downloads each POM once and rejects HTTP and malformed XML errors. */
     private Element document(Coordinate coordinate) throws Exception {
         if (!documents.containsKey(coordinate)) {
             URI uri = URI.create(baseUrl + "/" + coordinate.pomPath());

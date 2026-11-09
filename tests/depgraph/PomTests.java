@@ -4,12 +4,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
-/** Checks direct dependency parsing independently of remote repositories. */
 public final class PomTests {
-    /** Prevents utility construction. */
+
     private PomTests() { }
 
-    /** Verifies namespaces, properties, scopes, management and XML isolation. */
     public static void run() throws Exception {
         String xml = """
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
